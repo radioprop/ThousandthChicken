@@ -164,7 +164,7 @@ int dispose_of(box *b) {
 
 int h_filetype_box(box *b, type_image *img) {
 	char *br = (char*)malloc(5 * sizeof(char));
-	br = strncpy(br, (const char*)b->dbox, 4);
+	br = sstrncpy(br, (const char*)b->dbox, 4);
 
 	if(strcmp(br, "jp2\040")) {
 		println(INFO, "DOSEN'T Conform to IS 15444-1. Exiting");
@@ -173,7 +173,7 @@ int h_filetype_box(box *b, type_image *img) {
 		println(INFO, "Conforms to IS 15444-1");
 
 	char *minv = (char*)malloc(5 * sizeof(char));
-	minv = strncpy(minv, (const char*)&(b->dbox[4]), 4);
+	minv = sstrncpy(minv, (const char*)&(b->dbox[4]), 4);
 
 	if(hex_to_long( (unsigned char*)minv, 4) != 0) {
 		println(INFO, "MinV should be 0");
@@ -186,7 +186,7 @@ int h_filetype_box(box *b, type_image *img) {
 	int i = 1;
 	while(left) {
 		cl = (char*)malloc(5 * sizeof(char));
-		cl = strncpy(cl, (const char*)&(b->dbox)[4 + i*4], 4); left -= 4; i++;
+		cl = sstrncpy(cl, (const char*)&(b->dbox)[4 + i*4], 4); left -= 4; i++;
 
 		//TODO: filetype box: codestream profile restrictions
 		if(!strcmp(cl, "J2P0")) {
@@ -205,15 +205,15 @@ int h_filetype_box(box *b, type_image *img) {
 
 int h_image_header_box(box *b, type_image *img) {
 	char *cheight = (char*)malloc(5 * sizeof(char));
-	cheight = strncpy(cheight, (const char*)b->dbox, 4);
+	cheight = sstrncpy(cheight, (const char*)b->dbox, 4);
 	img->height = hex_to_long((unsigned char*)cheight, 4);
 
 	char *cwidth = (char*)malloc(5 * sizeof(char));
-	cwidth = strncpy(cwidth, (const char*)&(b->dbox)[4], 4);
+	cwidth = sstrncpy(cwidth, (const char*)&(b->dbox)[4], 4);
 	img->width = (uint16_t)hex_to_long((unsigned char*)cwidth, 4);
 
 	char *cnum_comp = (char*)malloc(3 * sizeof(char));
-	cnum_comp = strncpy(cnum_comp, (const char*)&(b->dbox)[8], 2);
+	cnum_comp = sstrncpy(cnum_comp, (const char*)&(b->dbox)[8], 2);
 	img->num_components = (uint16_t)hex_to_long((unsigned char*)cnum_comp, 2);
 
 	//TODO: bpc
