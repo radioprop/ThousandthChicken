@@ -10,9 +10,9 @@ typedef struct type_packet type_packet;
 
 /** Packet parameters */
 struct type_packet{
-	uint16_t *inclusion;
-	uint16_t *zero_bit_plane;
-	uint16_t *num_coding_passes;
+	unsigned short *inclusion;
+	unsigned short *zero_bit_plane;
+	unsigned short *num_coding_passes;
 };
 
 void decode_codestream(type_buffer *buffer, type_image *img);

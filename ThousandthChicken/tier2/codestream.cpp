@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include "codestream.h"
 #include "tag_tree_encode.h"
@@ -226,7 +225,7 @@ void read_qcd_marker(type_buffer * buffer, type_image *img)
 
 void read_main_header(type_buffer *buffer, type_image *img)
 {
-	uint32_t marker;
+	unsigned int marker;
 
 	/* Read SOC marker */
 	marker = read_buffer(buffer, 2);
@@ -251,9 +250,9 @@ void read_main_header(type_buffer *buffer, type_image *img)
 	}
 }
 
-uint32_t read_tile_header(type_buffer *buffer, type_tile *tile)
+unsigned int read_tile_header(type_buffer *buffer, type_tile *tile)
 {
-	uint32_t marker;
+	unsigned int marker;
 	int length, tile_no, total_length;
 	int tile_part_no, num_tile_parts;
 
@@ -353,7 +352,7 @@ void decode_packet_header(type_buffer *buffer, type_res_lvl *res_lvl)
 	type_packet *packet;
 	type_subband *sb;
 	type_codeblock *cblk;
-	uint32_t marker;
+	unsigned int marker;
 
 	for (i = 0; i < res_lvl->num_subbands; i++) {
 		sb = &(res_lvl->subbands[i]);
@@ -501,7 +500,7 @@ void decode_packet_body(type_buffer *buffer, type_res_lvl *res_lvl)
 
 void decode_tiles(type_buffer *buffer, type_tile *tile)
 {
-	uint32_t marker, tile_part_length;
+	unsigned int marker, tile_part_length;
 	type_image *img = tile->parent_img;
 	type_tile_comp *tile_comp;
 	type_res_lvl *res_lvl;
@@ -551,7 +550,7 @@ void decode_tiles(type_buffer *buffer, type_tile *tile)
 void decode_codestream(type_buffer *buffer, type_image *img)
 {
 	type_tile *tile;
-	uint32_t marker;
+	unsigned int marker;
 	int i;
 
 	read_main_header(buffer, img);

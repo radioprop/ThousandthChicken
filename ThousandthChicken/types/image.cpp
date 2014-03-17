@@ -15,7 +15,7 @@
  */
 void init_codeblocks(type_subband *sb) {
 	//	println_start(INFO);
-	uint32_t i;
+	unsigned int i;
 	type_codeblock *cblk;
 	type_tile_comp *tile_comp;
 
@@ -57,14 +57,14 @@ void init_codeblocks(type_subband *sb) {
  */
 void init_subbands(type_res_lvl *res_lvl) {
 	//	println_start(INFO);
-	uint8_t i;
+	unsigned char i;
 	type_subband *sb;
 	//	type_subband *sb_ll;
 	type_tile *tile;
 	type_tile_comp *tile_comp;
-	uint8_t xob, yob;
-	uint16_t tmp_x, tmp_y;
-	uint16_t sb_ll_width, sb_ll_height;
+	unsigned char xob, yob;
+	unsigned short tmp_x, tmp_y;
+	unsigned short sb_ll_width, sb_ll_height;
 
 	res_lvl->subbands = (type_subband *) malloc(res_lvl->num_subbands * sizeof(type_subband));
 
@@ -125,11 +125,11 @@ void init_subbands(type_res_lvl *res_lvl) {
  */
 void init_resolution_lvls(type_tile_comp *tile_comp) {
 	//	println_start(INFO);
-	uint8_t i;
+	unsigned char i;
 	type_res_lvl *res_lvl;
 	type_tile *parent_tile;
 	/* n = 2^(Nl-r) */
-	uint16_t n;
+	unsigned short n;
 	/* Precinct width and height */
 	int prec_width, prec_height;
 	tile_comp->res_lvls = (type_res_lvl *) malloc(tile_comp->num_rlvls * sizeof(type_res_lvl));
@@ -186,7 +186,7 @@ void init_resolution_lvls(type_tile_comp *tile_comp) {
  * @param tile This tile components will be initialized
  */
 void init_tile_comps(type_tile *tile, type_parameters *param) {
-	uint16_t i;
+	unsigned short i;
 	type_tile_comp *tile_comp;
 	type_image *parent_img;
 
@@ -235,11 +235,11 @@ void init_tile_comps(type_tile *tile, type_parameters *param) {
 void init_tiles(type_image **_img, type_parameters *param) {
 	//	println_start(INFO);
 	type_image *img = *_img;
-	uint32_t i = 0;
+	unsigned int i = 0;
 	/* Horizontal position of the tile */
-	uint16_t p;
+	unsigned short p;
 	/* Vertical position of the tile */
-	uint16_t q;
+	unsigned short q;
 	/* Temporary pointers */
 	type_tile *tile;
 

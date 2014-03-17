@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 
+#include <stdio.h>
 #include "../types/image_types.h"
 #include "../print_info/print_info.h"
 
@@ -31,7 +32,7 @@
  * @param size Number of pixels in each component (width x height).
  * @param level_shift Level shift.
  */
-void __global__ fdc_level_shift_kernel(type_data *idata, const uint16_t width, const uint16_t height, const int level_shift) {
+void __global__ fdc_level_shift_kernel(type_data *idata, const unsigned short width, const unsigned short height, const int level_shift) {
 #ifdef CUDA
 	int i = threadIdx.x;
 	int j = threadIdx.y;
@@ -81,7 +82,7 @@ int __device__ clamp_val(int val, int min, int max)
  * @param size Number of pixels in each component (width x height).
  * @param level_shift Level shift.
  */
-void __global__ idc_level_shift_kernel(type_data *idata, const uint16_t width, const uint16_t height, const int level_shift, const int min, const int max) {
+void __global__ idc_level_shift_kernel(type_data *idata, const unsigned short width, const unsigned short height, const int level_shift, const int min, const int max) {
 #ifdef CUDA
 	int i = threadIdx.x;
 	int j = threadIdx.y;
@@ -126,7 +127,7 @@ void __global__ idc_level_shift_kernel(type_data *idata, const uint16_t width, c
  * @param img_b 1D array with BLUE component of the image.
  * @param size Number of pixels in each component (width x height).
  */
-void __global__ rct_kernel(type_data *img_r, type_data *img_g, type_data *img_b, const uint16_t width, const uint16_t height, const int level_shift) {
+void __global__ rct_kernel(type_data *img_r, type_data *img_g, type_data *img_b, const unsigned short width, const unsigned short height, const int level_shift) {
 #ifdef CUDA
 	int i = threadIdx.x;
 	int j = threadIdx.y;
@@ -196,7 +197,7 @@ void __global__ rct_kernel(type_data *img_r, type_data *img_g, type_data *img_b,
  * @param size Number of pixels in each component (width x height).
  */
 //void __global__ tcr_kernel(type_data *img_r, type_data *img_g, type_data *img_b, long int size) {
-void __global__ tcr_kernel(type_data *img_r, type_data *img_g, type_data *img_b, const uint16_t width, const uint16_t height, const int level_shift, const int min, const int max) {
+void __global__ tcr_kernel(type_data *img_r, type_data *img_g, type_data *img_b, const unsigned short width, const unsigned short height, const int level_shift, const int min, const int max) {
 #ifdef CUDA
 	    int i = threadIdx.x;
 		int j = threadIdx.y;
@@ -276,7 +277,7 @@ void __global__ tcr_kernel(type_data *img_r, type_data *img_g, type_data *img_b,
  * @param img_b 1D array with BLUE component of the image.
  * @param size Number of pixels in each component (width x height).
  */
-void __global__ ict_kernel(type_data *img_r, type_data *img_g, type_data *img_b, const uint16_t width, const uint16_t height, const int level_shift) {
+void __global__ ict_kernel(type_data *img_r, type_data *img_g, type_data *img_b, const unsigned short width, const unsigned short height, const int level_shift) {
 #ifdef CUDA
 	int i = threadIdx.x;
 	int j = threadIdx.y;
@@ -351,7 +352,7 @@ void __global__ ict_kernel(type_data *img_r, type_data *img_g, type_data *img_b,
  * @param img_b 1D array with Y component of the image.
  * @param size Number of pixels in each component (width x height).
  */
-void __global__ tci_kernel(type_data *img_r, type_data *img_g, type_data *img_b, const uint16_t width, const uint16_t height, const int level_shift, const int min, const int max) {
+void __global__ tci_kernel(type_data *img_r, type_data *img_g, type_data *img_b, const unsigned short width, const unsigned short height, const int level_shift, const int min, const int max) {
 #ifdef CUDA
 	int i = threadIdx.x;
 	int j = threadIdx.y;

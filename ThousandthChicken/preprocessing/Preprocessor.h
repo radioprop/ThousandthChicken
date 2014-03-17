@@ -20,6 +20,7 @@ typedef enum {
 	TCI  ///Decoder part of the lossy flow.
 } color_trans_type;
 
+
 #include "../types/image_types.h"
 
 

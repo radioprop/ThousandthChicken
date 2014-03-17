@@ -7,7 +7,7 @@
 #include "config/help.h"
 #include "config/parameters.h"
 #include "preprocessing/Preprocessor.h"
-
+#include <stdio.h>
 #include "types/image_types.h"
 #include "types/buffered_stream.h"
 #include "types/image.h"
@@ -15,14 +15,17 @@
 #include "print_info/print_info.h"
 
 #include "dwt/DiscreteWaveletTansform.h"
+#include "CoefficientCoderGPU.h"
 
 #include "tier1/Dequant.h"
-#include "tier1/coeff_coder/gpu_coder.h"
+#include <stdio.h>
+
 
 #include "tier2/codestream.h"
 #include "tier2/buffer.h"
 
 #include "file_format/boxes.h"
+#include "basic.hpp"
 
 
 /**
@@ -32,12 +35,12 @@
  *
  * @return 0 on success
  */
-int decode(void)
+int decode(OpenCLBasic& oclObjects)
 {
 //	println_start(INFO);
 	type_image *img = (type_image *)malloc(sizeof(type_image));
 	memset(img, 0, sizeof(type_image));
-	img->in_file = "D:\\src\\openjpeg-data\\input\\conformance\\file1.jp2";
+	img->in_file = "c:\\src\\openjpeg-data\\input\\conformance\\file1.jp2";
 	type_parameters *param = (type_parameters*)malloc(sizeof(type_parameters));
 	default_config_values(param);
 	//init_device(param);
@@ -49,10 +52,11 @@ int decode(void)
 	}
 
 	type_tile *tile;
-	uint32_t i;
+	unsigned int i;
 	DiscreteWaveletTansform dwt;
 	Dequant dequant;
 	Preprocessor preprocessor;
+	CoefficientCoderGPU coefficientCoder(oclObjects);
 
 	if(strstr(img->in_file, ".jp2") != NULL) {
 		println(INFO, "It's a JP2 file");
@@ -65,7 +69,7 @@ int decode(void)
 		for(i = 0; i < img->num_tiles; i++) {
 			tile = &(img->tile[i]);
 			/* Decode data */
-			decode_tile(tile);
+			coefficientCoder.decode_tile(tile);
 			/* Dequantize data */
 			dequant.dequantize_tile(tile);
 			/* Do inverse wavelet transform */
@@ -103,7 +107,7 @@ int decode(void)
 		for(i = 0; i < img->num_tiles; i++)	{
 			tile = &(img->tile[i]);
 			/* Decode data */
-			decode_tile(tile);
+			coefficientCoder.decode_tile(tile);
 			/* Dequantize data */
 			dequant.dequantize_tile(tile);
 			/* Do inverse wavelet transform */

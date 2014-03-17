@@ -13,16 +13,28 @@
       <UniqueIdentifier>{D011BB44-1BF7-4113-997B-A081035B40D8}</UniqueIdentifier>
       <Extensions>cl</Extensions>
     </Filter>
+    <Filter Include="GPU">
+      <UniqueIdentifier>{ce48017e-3976-4f80-aca5-633fe84a99af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Intel_OpenCL_Build_Rules Include="MedianFilter.cl">
       <Filter>OpenCL Files</Filter>
     </Intel_OpenCL_Build_Rules>
+    <Intel_OpenCL_Build_Rules Include="CoefficientCoder.cl">
+      <Filter>OpenCL Files</Filter>
+    </Intel_OpenCL_Build_Rules>
+    <Intel_OpenCL_Build_Rules Include="Preprocessor.cl">
+      <Filter>OpenCL Files</Filter>
+    </Intel_OpenCL_Build_Rules>
+    <Intel_OpenCL_Build_Rules Include="DiscreteWavelet.cl">
+      <Filter>OpenCL Files</Filter>
+    </Intel_OpenCL_Build_Rules>
+    <Intel_OpenCL_Build_Rules Include="Quantization.cl">
+      <Filter>OpenCL Files</Filter>
+    </Intel_OpenCL_Build_Rules>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MedianFilter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -68,12 +80,6 @@
     <ClCompile Include="tier1\Dequant.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tier1\coeff_coder\gpu_coeff_coder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tier1\coeff_coder\gpu_coeff_coder2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tier2\buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -94,6 +100,21 @@
     </ClCompile>
     <ClCompile Include="decoder.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThousandthChicken.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CoefficientCoderGPU.cpp">
+      <Filter>GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="PreprocessorGPU.cpp">
+      <Filter>GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="DiscreteWaveletGPU.cpp">
+      <Filter>GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="QuantizationGPU.cpp">
+      <Filter>GPU</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,9 +175,6 @@
     <ClInclude Include="tier1\coeff_coder\gpu_coeff_coder2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tier1\coeff_coder\gpu_mq-coder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="tier2\buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -185,6 +203,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="types\image_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CoefficientCoderGPU.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="PreprocessorGPU.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="DiscreteWaveletGPU.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="QuantizationGPU.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="CoefficientCoderMQGPU.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="types\buffered_stream_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tier1\coeff_coder\gpu_coder_basic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

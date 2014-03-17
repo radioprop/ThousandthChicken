@@ -31,59 +31,59 @@ struct type_multiple_component_transformations
 	/** Transformation matrices */
 	type_mct* mcts[4];
 	/** Number of transformation matrices by type */
-	uint8_t mcts_count[4];
+	unsigned char mcts_count[4];
 
 	/** Multiple component collection segments */
 	type_mcc* mccs;
 
 	/** Count of component collection segments */
-	uint8_t mccs_count;
+	unsigned char mccs_count;
 
 	/** Multiple intermediate collection segments */
 	type_mic* mics;
 
 	/** Count of intermediate collection segments */
-	uint8_t mics_count;
+	unsigned char mics_count;
 
 	/** Arbitrary decomposition styles */
 	type_ads* adses;
 
 	/** Count of ADS segments */
-	uint8_t ads_count;
+	unsigned char ads_count;
 
 	/** Arbitrary transformation kernels */
 	type_atk* atks;
 
 	/** Count of ATK segemnts */
-	uint8_t atk_count;
+	unsigned char atk_count;
 };
 
 /** MCT as in 15444-2 Annex A.3.7 */
 struct type_mct
 {
 	/** Matrix definition index */
-	uint8_t index;
+	unsigned char index;
 
 	/** Matrix type */
-	uint8_t type;
+	unsigned char type;
 
 	/** Matrix element data type */
-	uint8_t element_type;
+	unsigned char element_type;
 
 	/** Element count */
-	uint32_t length;
+	unsigned int length;
 
 	/** Data */
-	uint8_t* data;
+	unsigned char* data;
 };
 
 /** MCC as in 15444-2 Annex A.3.8 */
 struct type_mcc {
 	/** Index of marker segment */
-	uint8_t index;
+	unsigned char index;
 
 	/** Count of collections in segment */
-	uint8_t count;
+	unsigned char count;
 
 	/** Component collections */
 	type_mcc_data* data;
@@ -92,54 +92,54 @@ struct type_mcc {
 /** Component Collection part of MCC segment as in 15444-2 Annex A.3.8 */
 struct type_mcc_data {
 	/** Decorrelation type */
-	uint8_t type;
+	unsigned char type;
 
 	/** Number of input components */
-	uint16_t input_count;
+	unsigned short input_count;
 
 	/** Are components number 8 or 16 bit? */
-	uint8_t input_component_type;
+	unsigned char input_component_type;
 
 	/** Input components identifiers */
-	uint8_t* input_components;
+	unsigned char* input_components;
 
 	/** Number of output components */
-	uint16_t output_count;
+	unsigned short output_count;
 
 	/** Are components number 8 or 16 bit? */
-	uint8_t output_component_type;
+	unsigned char output_component_type;
 
 	/** Input components identifiers */
-	uint8_t* output_components;
+	unsigned char* output_components;
 
 	/** Number of transform matrix to use in decorrelation process 
 	 *		Used only with matrix based decorrelation!
 	 */
-	uint8_t decorrelation_transform_matrix;
+	unsigned char decorrelation_transform_matrix;
 
 	/** Number of transform offset matrix to use in decorrelation process 
 	 *		Used only with matrix based decorrelation!
 	 */
-	uint8_t deccorelation_transform_offset;
+	unsigned char deccorelation_transform_offset;
 
 	/** Index of ATK marker
 	 * 	Used only with wavelet based decorrelation!
 	 */
-	uint8_t atk;
+	unsigned char atk;
 
 	/** Index of ADS marker
 	 * 	Used only with wavelet based decorrelation!
 	 */
-	uint8_t ads;
+	unsigned char ads;
 };
 
 /** MIC as in 15444-2 Annex A.3.9 */
 struct type_mic {
 	/** Index of marker segment */
-	uint8_t index;
+	unsigned char index;
 
 	/** Count of collections in segment */
-	uint8_t count;
+	unsigned char count;
 
 	/** Component collections */
 	type_mic_data* data;
@@ -148,83 +148,83 @@ struct type_mic {
 /** Component Intermediate Collection part of MIC segment as in 15444-2 Annex A.3.9 */
 struct type_mic_data {
 	/** Number of input components */
-	uint16_t input_count;
+	unsigned short input_count;
 
 	/** Are components number 8 or 16 bit? */
-	uint8_t input_component_type;
+	unsigned char input_component_type;
 
 	/** Input components identifiers */
-	uint8_t* input_components;
+	unsigned char* input_components;
 
 	/** Number of output components */
-	uint16_t output_count;
+	unsigned short output_count;
 
 	/** Are components number 8 or 16 bit? */
-	uint8_t output_component_type;
+	unsigned char output_component_type;
 
 	/** Input components identifiers */
-	uint8_t* output_components;
+	unsigned char* output_components;
 
 	/** Number of transform matrix to use in decorrelation process */ 
-	uint8_t decorrelation_transform_matrix;
+	unsigned char decorrelation_transform_matrix;
 
 	/** Number of transform offset matrix to use in decorrelation process */ 
-	uint8_t deccorelation_transform_offset;
+	unsigned char deccorelation_transform_offset;
 };
 
 struct type_ads {
 	/** Index of marker segment */
-	uint8_t index;
+	unsigned char index;
 	
 	/** Number of elements in the string defining the number of decomposition sub-levels */
-	uint8_t IOads;
+	unsigned char IOads;
 
 	/** String defining the number of decomposition sub-levels. */
-	uint8_t* DOads;
+	unsigned char* DOads;
 
 	/** Number of elements in the string defining the arbitrary decomposition structure. */
-	uint8_t ISads;
+	unsigned char ISads;
 
 	/** String defining the arbitrary decomposition structure. */
-	uint8_t* DSads;
+	unsigned char* DSads;
 };
 
 struct type_atk {
 	/** Index of marker segment */
-	uint8_t index;
+	unsigned char index;
 
 	/** Coefficients data type */
-	uint8_t coeff_type;
+	unsigned char coeff_type;
 
 	/** Wavelet filters */
-	uint8_t filter_category;
+	unsigned char filter_category;
 
 	/** Wavelet type */
-	uint8_t wavelet_type;
+	unsigned char wavelet_type;
 
 	/** Odd/Even indexed subsequence */
-	uint8_t m0;
+	unsigned char m0;
 
 	/** Number of lifting steps */
-	uint8_t lifing_steps;
+	unsigned char lifing_steps;
 
 	/** Number of lifting coefficients at lifting step */
-	uint8_t lifting_coefficients_per_step;
+	unsigned char lifting_coefficients_per_step;
 
 	/** Offset for lifting step */
-	uint8_t lifting_offset;
+	unsigned char lifting_offset;
 
 	/** Base two scaling exponent for lifting step s, εs for the reversible transform only */
-	uint8_t* scaling_exponent;
+	unsigned char* scaling_exponent;
 	
 	/** Scaling factor, for the irreversible transform only*/
-	uint8_t* scaling_factor;
+	unsigned char* scaling_factor;
 
 	/**The ith lifting coefficient for the jth lifting step,αs,k. The index, i, ranges from i = 0 to Natk-1 and is the inner loop (present for all of j). The index, j, ranges from j = 0 to Latk-1 and is the outer loop(incremented after a full run of i). */
-	uint8_t * coefficients;
+	unsigned char * coefficients;
 
 	/** The ith additive residue for lifting step, s. The index, i, ranges from i = 0 to Natk-1. Present for reversible transformations */
-	uint8_t* additive_residue;
+	unsigned char* additive_residue;
 };
 
 #endif

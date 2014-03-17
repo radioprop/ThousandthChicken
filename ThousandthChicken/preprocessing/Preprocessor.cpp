@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 
-
+#include <stdio.h>
 #include "../types/image_types.h"
 #include "../print_info/print_info.h"
 
@@ -40,7 +40,7 @@ int color_trans_gpu(type_image *img, color_trans_type type) {
 		cudaEventCreate(&kernel_stop);
 	#endif
 
-	uint32_t tile_size = 0, i;
+	unsigned int tile_size = 0, i;
 	type_tile *tile;
 	type_data *comp_a, *comp_b, *comp_c;
 
@@ -204,7 +204,7 @@ int Preprocessor::color_decoder_lossless(type_image *img) {
 
 void Preprocessor::dc_level_shifting(type_image *img, int sign)
 {
-	uint32_t i, j;
+	unsigned int i, j;
 	type_tile *tile;
 	type_data *idata;
 	int min = 0;

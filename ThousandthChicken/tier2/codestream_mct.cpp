@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include "codestream.h"
@@ -18,8 +17,8 @@
 void read_mct_marker(type_buffer *buffer, type_image *img) {
 	int marker;
 	int length;
-	uint16_t Smct;
-	uint8_t type;
+	unsigned short Smct;
+	unsigned char type;
 	int i;
 
 	/* Read MCT Marker */
@@ -52,7 +51,7 @@ void read_mct_marker(type_buffer *buffer, type_image *img) {
 		mct->type = type;
 		mct->element_type = (Smct&(3<<6))>>6;
 		mct->length = length/(1<<mct->element_type);
-		mct->data = (uint8_t*)malloc(length);
+		mct->data = (unsigned char*)malloc(length);
 		for(i=0; i<length; ++i) {
 			mct->data[i] = read_byte(buffer);
 		}
@@ -69,10 +68,10 @@ void read_mct_marker(type_buffer *buffer, type_image *img) {
 void read_mcc_marker(type_buffer *buffer, type_image *img) {
 	int marker;
 	int length;
-	uint16_t i;
+	unsigned short i;
 	int count=0;
-	uint16_t temp_16;
-	uint8_t temp_8;
+	unsigned short temp_16;
+	unsigned char temp_8;
 
 	type_mcc* old_mccs = img->mct_data->mccs;
 	img->mct_data->mccs = (type_mcc*)realloc(img->mct_data->mccs, sizeof(type_mcc) * (++img->mct_data->mccs_count));
@@ -112,7 +111,7 @@ void read_mcc_marker(type_buffer *buffer, type_image *img) {
 		/* input component collection data */
 		temp_16 = mcc_data->input_count * (1<<mcc_data->input_component_type);
 		length-=temp_16;
-		mcc_data->input_components = (uint8_t*)calloc(temp_16, sizeof(uint8_t));
+		mcc_data->input_components = (unsigned char*)calloc(temp_16, sizeof(unsigned char));
 		for(i=0; i<temp_16; ++i) {
 			mcc_data->input_components[i] = read_byte(buffer);
 		}
@@ -126,7 +125,7 @@ void read_mcc_marker(type_buffer *buffer, type_image *img) {
 		/* output component collection data */
 		temp_16 = mcc_data->output_count * (1<<mcc_data->output_component_type);
 		length-=temp_16;
-		mcc_data->output_components = (uint8_t*)calloc(temp_16, sizeof(uint8_t));
+		mcc_data->output_components = (unsigned char*)calloc(temp_16, sizeof(unsigned char));
 		for(i=0; i<temp_16; ++i) {
 			mcc_data->output_components[i] = read_byte(buffer);
 		}
@@ -161,10 +160,10 @@ void read_mcc_marker(type_buffer *buffer, type_image *img) {
 void read_mic_marker(type_buffer *buffer, type_image *img) {
 	int marker;
 	int length;
-	uint16_t i;
+	unsigned short i;
 	int count=0;
-	uint16_t temp_16;
-	uint8_t temp_8;
+	unsigned short temp_16;
+	unsigned char temp_8;
 
 	type_mic* old_mics = img->mct_data->mics;
 	img->mct_data->mics = (type_mic*)realloc(img->mct_data->mics, sizeof(type_mic) * (++img->mct_data->mics_count));
@@ -202,7 +201,7 @@ void read_mic_marker(type_buffer *buffer, type_image *img) {
 		/* input component collection data */
 		temp_16 = mic_data->input_count * (1<<mic_data->input_component_type);
 		length-=temp_16;
-		mic_data->input_components = (uint8_t*)calloc(temp_16, sizeof(uint8_t));
+		mic_data->input_components = (unsigned char*)calloc(temp_16, sizeof(unsigned char));
 		for(i=0; i<temp_16; ++i) {
 			mic_data->input_components[i] = read_byte(buffer);
 		}
@@ -216,7 +215,7 @@ void read_mic_marker(type_buffer *buffer, type_image *img) {
 		/* output component collection data */
 		temp_16 = mic_data->output_count * (1<<mic_data->output_component_type);
 		length-=temp_16;
-		mic_data->output_components = (uint8_t*)calloc(temp_16, sizeof(uint8_t));
+		mic_data->output_components = (unsigned char*)calloc(temp_16, sizeof(unsigned char));
 		for(i=0; i<temp_16; ++i) {
 			mic_data->output_components[i] = read_byte(buffer);
 		}
@@ -242,7 +241,7 @@ void read_atk_marker(type_buffer *buffer, type_image *img) {
 	int length;
 	int i;
 	int count;
-	uint16_t temp;
+	unsigned short temp;
 	type_atk* old_atks = img->mct_data->atks;
 	img->mct_data->atks = (type_atk*)realloc(img->mct_data->atks, sizeof(type_atk) * (++img->mct_data->atk_count));
 	type_atk* atk = &img->mct_data->atks[img->mct_data->atk_count-1];
@@ -275,7 +274,7 @@ void read_atk_marker(type_buffer *buffer, type_image *img) {
 	atk->lifting_offset = read_byte(buffer);
 
 	count = 1<<atk->coeff_type;
-	uint8_t* t = (uint8_t*)calloc(count, sizeof(uint8_t));
+	unsigned char* t = (unsigned char*)calloc(count, sizeof(unsigned char));
 	for(i=0; i<count; ++i) {
 		t[i]=read_byte(buffer);
 	}
@@ -287,14 +286,14 @@ void read_atk_marker(type_buffer *buffer, type_image *img) {
 	}
 
 	count = atk->lifing_steps * atk->lifting_coefficients_per_step * atk->wavelet_type?1:(1<<atk->coeff_type);
-	atk->coefficients = (uint8_t*)calloc(count, sizeof(uint8_t));
+	atk->coefficients = (unsigned char*)calloc(count, sizeof(unsigned char));
 	for(i=0; i<count; ++i) {
 		atk->coefficients[i] = read_byte(buffer);
 	}
 
 	if(atk->wavelet_type == 1) {
 		count = atk->lifing_steps * (1<<atk->coeff_type);
-		atk->additive_residue = (uint8_t*)calloc(count, sizeof(uint8_t));
+		atk->additive_residue = (unsigned char*)calloc(count, sizeof(unsigned char));
 		for(i=0; i<count; ++i) {
 			atk->additive_residue[i] = read_byte(buffer);
 		}
@@ -312,7 +311,7 @@ void read_ads_marker(type_buffer *buffer, type_image *img) {
 	int marker;
 	int length;
 	int i;
-	uint8_t temp;
+	unsigned char temp;
 
 	type_ads* old_adses = img->mct_data->adses;
 	img->mct_data->adses = (type_ads*)realloc(img->mct_data->adses, sizeof(type_ads) * (++img->mct_data->ads_count));
@@ -335,7 +334,7 @@ void read_ads_marker(type_buffer *buffer, type_image *img) {
 	length = read_buffer(buffer, 4)-5;
 	ads->index = read_byte(buffer);
 	ads->IOads = read_byte(buffer);
-	ads->DOads = (uint8_t*)calloc(ads->IOads, sizeof(uint8_t));	
+	ads->DOads = (unsigned char*)calloc(ads->IOads, sizeof(unsigned char));	
 	i = 0;
 	while(ads->DOads - i >0) {
 		if(i%4 == 0)
@@ -345,7 +344,7 @@ void read_ads_marker(type_buffer *buffer, type_image *img) {
 	}
 
 	ads->ISads = read_byte(buffer);
-	ads->DSads = (uint8_t*)calloc(ads->ISads, sizeof(uint8_t));	
+	ads->DSads = (unsigned char*)calloc(ads->ISads, sizeof(unsigned char));	
 	i = 0;
 	while(ads->DSads - i >0) {
 		if(i%4 == 0)

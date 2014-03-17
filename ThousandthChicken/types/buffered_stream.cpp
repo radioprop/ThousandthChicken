@@ -1,5 +1,3 @@
-#include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -14,7 +12,7 @@
 void init_buffer(type_buffer *buffer)
 {
 //	println_start(INFO);
-	buffer->data = (uint8_t*) malloc(INIT_BUF_SIZE);
+	buffer->data = (unsigned char*) malloc(INIT_BUF_SIZE);
 	buffer->byte = 0;
 	buffer->bytes_count = 0;
 	buffer->bits_count = 0;
@@ -27,17 +25,17 @@ void seek_buffer(type_buffer *buffer, int pos)
 	buffer->bp = buffer->start + pos;
 }
 
-int32_t num_bytes_left(type_buffer *buffer)
+int num_bytes_left(type_buffer *buffer)
 {
 	return buffer->end - buffer->bp;
 }
 
-uint8_t *get_bp_buffer(type_buffer *buffer)
+unsigned char *get_bp_buffer(type_buffer *buffer)
 {
 	return buffer->bp;
 }
 
-uint8_t read_byte(type_buffer *buffer)
+unsigned char read_byte(type_buffer *buffer)
 {
 	if(buffer->bp >= buffer->end)
 	{
@@ -47,10 +45,10 @@ uint8_t read_byte(type_buffer *buffer)
 	return *buffer->bp++;
 }
 
-uint32_t read_buffer(type_buffer *buffer, int n)
+unsigned int read_buffer(type_buffer *buffer, int n)
 {
 	int i;
-	uint32_t val = 0;
+	unsigned int val = 0;
 
 	for(i = n - 1; i >= 0; i--)
 	{
@@ -64,13 +62,13 @@ uint32_t read_buffer(type_buffer *buffer, int n)
  *
  * @param buffer
  */
-uint16_t peek_marker(type_buffer *buffer) {
+unsigned short peek_marker(type_buffer *buffer) {
 	if(buffer->bp+1 >= buffer->end)
 	{
 		println_var(INFO, "Error: Exceeded buffer bounds!");
 		exit(0);
 	}
-	uint16_t val = (*buffer->bp)<<8;
+	unsigned short val = (*buffer->bp)<<8;
 	val += *(buffer->bp+1);
 	return val;
 }
@@ -80,12 +78,12 @@ void skip_buffer(type_buffer *buffer, int n)
 	buffer->bp += n;
 }
 
-int32_t tell_buffer(type_buffer *buffer)
+int tell_buffer(type_buffer *buffer)
 {
 	return buffer->bp - buffer->start;
 }
 
-uint32_t read_byte_(type_buffer *buffer)
+unsigned int read_byte_(type_buffer *buffer)
 {
 	buffer->byte = (buffer->byte << 8) & 0xffff;
 	buffer->bits_count = buffer->byte == 0xff00 ? 7 : 8;
@@ -97,7 +95,7 @@ uint32_t read_byte_(type_buffer *buffer)
 	return 0;
 }
 
-uint32_t read_bit(type_buffer *buffer)
+unsigned int read_bit(type_buffer *buffer)
 {
 	if(buffer->bits_count == 0)
 	{
@@ -107,7 +105,7 @@ uint32_t read_bit(type_buffer *buffer)
 	return (buffer->byte >> buffer->bits_count) & 1;
 }
 
-uint32_t read_bits(type_buffer *buffer, int n)
+unsigned int read_bits(type_buffer *buffer, int n)
 {
 	int i, val = 0;
 
@@ -119,7 +117,7 @@ uint32_t read_bits(type_buffer *buffer, int n)
 	return val;
 }
 
-uint32_t inalign(type_buffer *buffer)
+unsigned int inalign(type_buffer *buffer)
 {
 	buffer->bits_count = 0;
 	if((buffer->byte & 0xff) == 0xff)
@@ -135,10 +133,10 @@ uint32_t inalign(type_buffer *buffer)
 
 void enlarge_buffer_n(type_buffer *buffer, int size)
 {
-	uint8_t *old_data = buffer->data;
+	unsigned char *old_data = buffer->data;
 	/* Enlarge buffer to new_size */
-	uint32_t new_size = size;
-	buffer->data = (uint8_t*)malloc(new_size);
+	unsigned int new_size = size;
+	buffer->data = (unsigned char*)malloc(new_size);
 	memcpy(buffer->data, old_data, buffer->size);
 	buffer->size = new_size;
 	free(old_data);
@@ -160,7 +158,7 @@ void enlarge_buffer(type_buffer *buffer)
  * @param buffer
  * @param val
  */
-void write_byte(type_buffer *buffer, uint8_t val)
+void write_byte(type_buffer *buffer, unsigned char val)
 {
 	if(buffer->bytes_count == buffer->size)
 	{
@@ -178,7 +176,7 @@ void write_byte(type_buffer *buffer, uint8_t val)
  * @param buffer
  * @param val
  */
-void write_short(type_buffer *buffer, uint16_t val)
+void write_short(type_buffer *buffer, unsigned short val)
 {
 	write_byte(buffer, val >> 8);
 	write_byte(buffer, val);
@@ -190,7 +188,7 @@ void write_short(type_buffer *buffer, uint16_t val)
  * @param buffer
  * @param val
  */
-void write_int(type_buffer *buffer, uint32_t val)
+void write_int(type_buffer *buffer, unsigned int val)
 {
 	write_byte(buffer, val >> 24);
 	write_byte(buffer, val >> 16);
@@ -264,7 +262,7 @@ void write_bits(type_buffer *buffer, int bits, int n)
 	}
 }
 
-void write_array(type_buffer *buffer, uint8_t *in, int length)
+void write_array(type_buffer *buffer, unsigned char *in, int length)
 {
 	int i;
 
@@ -294,7 +292,7 @@ void write_array(type_buffer *buffer, uint8_t *in, int length)
 //	}
 }
 
-void update_buffer_byte(type_buffer *buffer, int pos, uint8_t val)
+void update_buffer_byte(type_buffer *buffer, int pos, unsigned char val)
 {
 	buffer->data[pos] = val;
 }
@@ -307,5 +305,5 @@ void update_buffer_byte(type_buffer *buffer, int pos, uint8_t val)
  */
 void write_buffer_to_file(type_buffer *buffer, FILE *fp)
 {
-	fwrite(buffer->data, sizeof(uint8_t), buffer->bytes_count, fp);
+	fwrite(buffer->data, sizeof(unsigned char), buffer->bytes_count, fp);
 }

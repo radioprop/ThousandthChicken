@@ -1,8 +1,8 @@
-#ifndef IMAGE_TYPES_H_
-#define IMAGE_TYPES_H_
+#pragma once
 
-#include <stdint.h>
-#include "../tier2/tag_tree_encode.h"
+#include "../tier2/tag_tree.h"
+
+#include "buffered_stream_type.h"
 #include "image_mct.h"
 
 #define UNSIGNED 0U
@@ -31,55 +31,55 @@ typedef enum
 struct type_codeblock
 {
 	/** Codeblock number in raster order */
-	uint32_t cblk_no;
+	unsigned int cblk_no;
 
 	/** Codeblock number  in the horizontal direction */
-	uint16_t no_x;
+	unsigned short no_x;
 
 	/** Codeblock number  in the vertical direction */
-	uint16_t no_y;
+	unsigned short no_y;
 
 	/** The x-coordinate of the top-left corner of the codeblock, regarding to subband. */
-	uint16_t tlx;
+	unsigned short tlx;
 
 	/** The y-coordinate of the top-left corner of the codeblock, regarding to subband. */
-	uint16_t tly;
+	unsigned short tly;
 
 	/** The x-coordinate of the bottom-right corner of the codeblock, regarding to subband. */
-	uint16_t brx;
+	unsigned short brx;
 
 	/** The y-coordinate of the bottom-right corner of the codeblock, regarding to subband. */
-	uint16_t bry;
+	unsigned short bry;
 
 	/** Codeblock width */
-	uint16_t width;
+	unsigned short width;
 
 	/** Codeblock height */
-	uint16_t height;
+	unsigned short height;
 
 	/** Pointer to codeblock data on gpu */
-	int32_t *data_d;
+	int *data_d;
 
 	/** Parent subband */
 	type_subband *parent_sb;
 
 	/** Code block bytestream */
-	uint8_t *codestream;
+	unsigned char *codestream;
 
 	/** Codestream length */
-	uint32_t length;
+	unsigned int length;
 
 	/** Significant bits in codeblock */
-	uint8_t significant_bits;
+	unsigned char significant_bits;
 
 	/** Number of length bits */
-	uint32_t num_len_bits;
+	unsigned int num_len_bits;
 
 	/** Number of segments */
-	uint32_t num_segments;
+	unsigned int num_segments;
 
 	/** Number of coding passes */
-	uint32_t num_coding_passes;
+	unsigned int num_coding_passes;
 };
 
 /** Subband coding parameters */
@@ -89,43 +89,43 @@ struct type_subband
 	type_orient orient;
 
 	/** The x-coordinate of the top-left corner of the subband, regarding to tile-component. tbx0 */
-	uint16_t tlx;
+	unsigned short tlx;
 
 	/** The y-coordinate of the top-left corner of the subband, regarding to tile-component. tby0 */
-	uint16_t tly;
+	unsigned short tly;
 
 	/** The x-coordinate of the bottom-right corner of the subband, regarding to tile-component. tbx1 */
-	uint16_t brx;
+	unsigned short brx;
 
 	/** The y-coordinate of the bottom-right corner of the subband, regarding to tile-component. tby1 */
-	uint16_t bry;
+	unsigned short bry;
 
 	/** Subband width */
-	uint16_t width;
+	unsigned short width;
 
 	/** Subband height */
-	uint16_t height;
+	unsigned short height;
 
 	/** Number of codeblocks in the horizontal direction in subband. */
-	uint16_t num_xcblks;
+	unsigned short num_xcblks;
 
 	/** Number of codeblocks in the vertical direction in subband. */
-	uint16_t num_ycblks;
+	unsigned short num_ycblks;
 
 	/** Total number of codeblocks in subband */
-	uint32_t num_cblks;
+	unsigned int num_cblks;
 
 	/** Codeblocks in current subband */
 	type_codeblock *cblks;
 
 	/** Codeblocks data on gpu */
-	int32_t *cblks_data_d;
+	int *cblks_data_d;
 
 	/** Codeblocks data on cpu */
-	int32_t *cblks_data_h;
+	int *cblks_data_h;
 
 	/** Number of magnitude bits in the integer representation of the quantized data */
-	uint8_t mag_bits;
+	unsigned char mag_bits;
 
 	/** Quantization step size */
 	type_data step_size;
@@ -137,10 +137,10 @@ struct type_subband
 	type_res_lvl *parent_res_lvl;
 
 	/** Exponent */
-	uint16_t expn;
+	unsigned short expn;
 
 	/** Matissa */
-	uint16_t mant;
+	unsigned short mant;
 
 	/** Inclusion tag tree */
 	type_tag_tree *inc_tt;
@@ -152,50 +152,50 @@ struct type_subband
 struct type_res_lvl
 {
 	/** Resolution level number. r */
-	uint8_t res_lvl_no;
+	unsigned char res_lvl_no;
 
 	/** Decomposition level number. nb */
-	uint8_t dec_lvl_no;
+	unsigned char dec_lvl_no;
 
 	/** The x-coordinate of the top-left corner of the tile-component
 	 at this resolution. trx0 */
-	uint16_t tlx;
+	unsigned short tlx;
 
 	/** The y-coordinate of the top-left corner of the tile-component
 	 at this resolution. try0 */
-	uint16_t tly;
+	unsigned short tly;
 
 	/** The x-coordinate of the bottom-right corner of the tile-component
 	 at this resolution(plus one). trx1 */
-	uint16_t brx;
+	unsigned short brx;
 
 	/** The y-coordinate of the bottom-right corner of the tile-component
 	 at this resolution(plus one). try1 */
-	uint16_t bry;
+	unsigned short bry;
 
 	/** Resolution level width */
-	uint16_t width;
+	unsigned short width;
 
 	/** Resolution level height */
-	uint16_t height;
+	unsigned short height;
 
 	/** The exponent value for the precinct width. PPx */
-	uint8_t prc_exp_w;
+	unsigned char prc_exp_w;
 
 	/** The exponent value for the precinct height PPy */
-	uint8_t prc_exp_h;
+	unsigned char prc_exp_h;
 
 	/** Number of precincts in the horizontal direction in resolution level. numprecinctswide */
-	uint16_t num_hprc;
+	unsigned short num_hprc;
 
 	/** Number of precincts in the vertical direction in resolution level. numprecinctshigh */
-	uint16_t num_vprc;
+	unsigned short num_vprc;
 
 	/** Total number of precincts. numprecincts */
-	uint16_t num_prcs;
+	unsigned short num_prcs;
 
 	/** Number of subbands */
-	uint8_t num_subbands;
+	unsigned char num_subbands;
 
 	/** Subbands in current resolution level */
 	type_subband *subbands;
@@ -208,40 +208,40 @@ struct type_res_lvl
 struct type_tile_comp
 {
 	/** Tile_comp number */
-	uint32_t tile_comp_no;
+	unsigned int tile_comp_no;
 
 	/** XXX: Tiles on specific components may have different sizes, because components can have various sizes. See ISO B.3 */
 	/** Tile-component width. */
-	uint16_t width;
+	unsigned short width;
 
 	/** Tile-component height */
-	uint16_t height;
+	unsigned short height;
 
 	/** Number of decomposition levels. NL. COD marker */
-	uint8_t num_dlvls;
+	unsigned char num_dlvls;
 
 	/** Number of the resolution levels. */
-	uint8_t num_rlvls;
+	unsigned char num_rlvls;
 
 	/** The max exponent value for code-block width */
 	/** XXX: Minimum for code-block dimension is 4.
 	 * 	Maximum dimension is 64.  */
-	uint8_t cblk_exp_w;
+	unsigned char cblk_exp_w;
 
 	/** The max exponent value for code-block height */
-	uint8_t cblk_exp_h;
+	unsigned char cblk_exp_h;
 
 	/** Nominal codeblock width */
-	uint8_t cblk_w;
+	unsigned char cblk_w;
 
 	/** Nominal codeblock height */
-	uint8_t cblk_h;
+	unsigned char cblk_h;
 
 	/** Quantization style for all components */
-	uint16_t quant_style;
+	unsigned short quant_style;
 
 	/** Number of guard bits */
-	uint8_t num_guard_bits;
+	unsigned char num_guard_bits;
 
 	/** Tile component data in the host memory (this is page-locked memory, prepared for copying to device) */
 	type_data *img_data;
@@ -259,28 +259,28 @@ struct type_tile_comp
 struct type_tile
 {
 	/** Tile number in raster order */
-	uint32_t tile_no;
+	unsigned int tile_no;
 
 	/** The x-coord of the top left corner of the tile with respect to the original image. tx0 */
-	uint16_t tlx;
+	unsigned short tlx;
 
 	/** The y-coord of the top left corner of the tile with respect to the original image. ty0 */
-	uint16_t tly;
+	unsigned short tly;
 
 	/** The x-coord of the bottom right corner of the tile with respect to the original image. tx1 */
-	uint16_t brx;
+	unsigned short brx;
 
 	/** The y-coord of the bottom right corner of the tile with respect to the original image. ty1 */
-	uint16_t bry;
+	unsigned short bry;
 
 	/** Tile width */
-	uint16_t width;
+	unsigned short width;
 
 	/** Tile height */
-	uint16_t height;
+	unsigned short height;
 
 	/** Quantization style for each channel (ready for QCD/QCC marker) */
-	int8_t QS;
+	char QS;
 
 	/** Tile on specific component/channel in host memory */
 	type_tile_comp *tile_comp;
@@ -295,37 +295,37 @@ struct type_coding_param
 	/* Image area */
 	/** The horizontal offset from the origin of the reference grid to the
 	 left edge of the image area. XOsiz */
-	uint16_t imgarea_tlx;
+	unsigned short imgarea_tlx;
 	/** The vertical offset from the origin of the reference grid to the
 	 left edge of the image area. YOsiz */
-	uint16_t imgarea_tly;
+	unsigned short imgarea_tly;
 
 	/** The horizontal offset from the origin of the reference grid to the
 	 right edge of the image area. Xsiz */
-	uint16_t imgarea_width;
+	unsigned short imgarea_width;
 	/** The vertical offset from the origin of the reference grid to the
 	 right edge of the image area. Ysiz */
-	uint16_t imgarea_height;
+	unsigned short imgarea_height;
 
 	/* Tile grid */
 	/** The horizontal offset from the origin of the tile grid to the
 	 origin of the reference grid. XTOsiz */
-	uint16_t tilegrid_tlx;
+	unsigned short tilegrid_tlx;
 	/** The vertical offset from the origin of the tile grid to the
 	 origin of the reference grid. YTOsiz */
-	uint16_t tilegrid_tly;
+	unsigned short tilegrid_tly;
 
 	/** The component horizontal sampling factor. XRsiz */
-	uint16_t comp_step_x;
+	unsigned short comp_step_x;
 
 	/** The component vertical sampling factor. YRsiz */
-	uint16_t comp_step_y;
+	unsigned short comp_step_y;
 
 	/** Base step size */
 	type_data base_step;
 
 	/** Target size when using PCRD */
-	uint32_t target_size;
+	unsigned int target_size;
 };
 
 struct type_image
@@ -343,77 +343,77 @@ struct type_image
 	const char *conf_file;
 
 	/** Mct_compression_method: 0 klt, 2 wavelet */
-	uint8_t mct_compression_method;
+	unsigned char mct_compression_method;
 
 	/** BSQ file type */
-	uint8_t bsq_file;
+	unsigned char bsq_file;
 
 	/** BIP file type */
-	uint8_t bip_file;
+	unsigned char bip_file;
 
 	/** BIL file type */
-	uint8_t bil_file;
+	unsigned char bil_file;
 
 	/** Image width */
-	uint16_t width;
+	unsigned short width;
 
 	/** Image height */
-	uint16_t height;
+	unsigned short height;
 
 	/** Number of channels/components. Csiz */
-	uint16_t num_components;
+	unsigned short num_components;
 
 	/** Original bit depth. XXX: Should be separate for every component */
-	uint16_t depth;
+	unsigned short depth;
 
 	/** Data sign. XXX: Should be separate for every component.
 	 * Really separate? i think we can safely assume all components are either signed or unsigned (q)*/
-	uint8_t sign;
+	unsigned char sign;
 
 	/** Nominal number of decomposition levels */
-	uint8_t num_dlvls;
+	unsigned char num_dlvls;
 
 	/** Type of wavelet transform: lossless DWT_53, lossy DWT_97. COD marker */
-	uint8_t wavelet_type;
+	unsigned char wavelet_type;
 
 	/** Area allocated in the device memory */
-	int32_t area_alloc;
+	int area_alloc;
 
 	/** The nominal tile width. XTsiz. SIZ marker */
-	uint16_t tile_w;
+	unsigned short tile_w;
 	/** The nominal tile height. YTsiz. SIZ marker */
-	uint16_t tile_h;
+	unsigned short tile_h;
 
 	/** Number of tiles in horizontal direction. nunXtiles */
-	uint16_t num_xtiles;
+	unsigned short num_xtiles;
 	/** Number of tiles in vertical direction. numYtiles */
-	uint16_t num_ytiles;
+	unsigned short num_ytiles;
 	/** Number of all tiles */
-	uint32_t num_tiles;
+	unsigned int num_tiles;
 
 	/** Was the MCT used? */
-	uint8_t use_mct;
+	unsigned char use_mct;
 
 	/** Was MCT as in 15444-2 standard */
-	uint8_t use_part2_mct;
+	unsigned char use_part2_mct;
 
 	/** Data for MCT as in 15444-2 */
 	type_multiple_component_transformations* mct_data;
 
 	/** Nominal range of bits */
-	uint8_t num_range_bits;
+	unsigned char num_range_bits;
 
 	/** Coding style for all components */
-	int32_t coding_style;
+	int coding_style;
 
 	/** Codeblock coding style */
-	uint8_t cblk_coding_style;
+	unsigned char cblk_coding_style;
 
 	/** Progression order */
-	uint8_t prog_order;
+	unsigned char prog_order;
 
 	/** Number of layers */
-	uint16_t num_layers;
+	unsigned short num_layers;
 
 	/** Initial real-image data on GPU, used only in read_image and color transformation,
 	 * after tiling use pointers in tile->tile_comp.*/
@@ -425,4 +425,3 @@ struct type_image
 	type_coding_param *coding_param;
 };
 
-#endif

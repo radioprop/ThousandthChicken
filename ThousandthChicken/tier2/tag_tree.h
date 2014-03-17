@@ -6,7 +6,6 @@
 #define QUAD_SIZE_X 2
 #define QUAD_SIZE_Y 2
 
-#include <stdint.h>
 
 typedef struct type_tag_tree_node type_tag_tree_node;
 typedef struct type_tag_tree type_tag_tree;

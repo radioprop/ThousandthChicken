@@ -210,11 +210,11 @@ int h_image_header_box(box *b, type_image *img) {
 
 	char *cwidth = (char*)malloc(5 * sizeof(char));
 	cwidth = sstrncpy(cwidth, (const char*)&(b->dbox)[4], 4);
-	img->width = (uint16_t)hex_to_long((unsigned char*)cwidth, 4);
+	img->width = (unsigned short)hex_to_long((unsigned char*)cwidth, 4);
 
 	char *cnum_comp = (char*)malloc(3 * sizeof(char));
 	cnum_comp = sstrncpy(cnum_comp, (const char*)&(b->dbox)[8], 2);
-	img->num_components = (uint16_t)hex_to_long((unsigned char*)cnum_comp, 2);
+	img->num_components = (unsigned short)hex_to_long((unsigned char*)cnum_comp, 2);
 
 	//TODO: bpc
 
@@ -269,7 +269,7 @@ void h_contiguous_codestream_box(box *cbox, type_image *img) {
 	long int codestream_len = cbox->content_length;
 
 	type_buffer *src_buff = (type_buffer *) malloc(sizeof(type_buffer));
-	src_buff->data = (uint8_t *) malloc(codestream_len+1);
+	src_buff->data = (unsigned char *) malloc(codestream_len+1);
 	src_buff->size = codestream_len;
 
 	src_buff->data = cbox->dbox;

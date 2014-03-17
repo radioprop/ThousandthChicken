@@ -2,7 +2,7 @@
 #define BUFFER_H_
 
 
-#include <stdio.h>
+
 #include "../types/buffered_stream.h"
 
 void init_dec_buffer(FILE *fsrc, type_buffer *src_buff);

@@ -157,9 +157,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Intel_OpenCL_Build_Rules Include="CoefficientCoder.cl" />
+    <Intel_OpenCL_Build_Rules Include="DiscreteWavelet.cl" />
     <Intel_OpenCL_Build_Rules Include="MedianFilter.cl" />
+    <Intel_OpenCL_Build_Rules Include="Preprocessor.cl" />
+    <Intel_OpenCL_Build_Rules Include="Quantization.cl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CoefficientCoderGPU.cpp" />
     <ClCompile Include="common\basic.cpp" />
     <ClCompile Include="common\cmdparser.cpp" />
     <ClCompile Include="common\oclobject.cpp" />
@@ -167,17 +172,18 @@
     <ClCompile Include="config\ini.cpp" />
     <ClCompile Include="config\parameters.cpp" />
     <ClCompile Include="decoder.cpp" />
+    <ClCompile Include="DiscreteWaveletGPU.cpp" />
     <ClCompile Include="dwt\DiscreteWaveletTansform.cpp" />
     <ClCompile Include="dwt\iwt.cpp" />
     <ClCompile Include="dwt\iwt_new.cpp" />
     <ClCompile Include="file_format\boxes.cpp" />
-    <ClCompile Include="MedianFilter.cpp" />
+    <ClCompile Include="PreprocessorGPU.cpp" />
+    <ClCompile Include="QuantizationGPU.cpp" />
+    <ClCompile Include="ThousandthChicken.cpp" />
     <ClCompile Include="preprocessing\Preprocessor.cpp" />
     <ClCompile Include="preprocessing\preprocess_gpu.cpp" />
     <ClCompile Include="print_info\print_info.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="tier1\coeff_coder\gpu_coeff_coder.cpp" />
-    <ClCompile Include="tier1\coeff_coder\gpu_coeff_coder2.cpp" />
     <ClCompile Include="tier1\Dequant.cpp" />
     <ClCompile Include="tier2\buffer.cpp" />
     <ClCompile Include="tier2\codestream.cpp" />
@@ -187,6 +193,8 @@
     <ClCompile Include="types\image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CoefficientCoderGPU.h" />
+    <ClInclude Include="CoefficientCoderMQGPU.h" />
     <ClInclude Include="common\basic.hpp" />
     <ClInclude Include="common\cmdparser.hpp" />
     <ClInclude Include="common\oclobject.hpp" />
@@ -194,18 +202,21 @@
     <ClInclude Include="config\help.h" />
     <ClInclude Include="config\ini.h" />
     <ClInclude Include="config\parameters.h" />
+    <ClInclude Include="DiscreteWaveletGPU.h" />
     <ClInclude Include="dwt\DiscreteWaveletTansform.h" />
     <ClInclude Include="dwt\iwt.h" />
     <ClInclude Include="dwt\iwt_new.h" />
     <ClInclude Include="file_format\boxes.h" />
     <ClInclude Include="preprocessing\preprocessing_constants.h" />
     <ClInclude Include="preprocessing\Preprocessor.h" />
+    <ClInclude Include="PreprocessorGPU.h" />
     <ClInclude Include="print_info\print_info.h" />
+    <ClInclude Include="QuantizationGPU.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tier1\coeff_coder\gpu_coder.h" />
+    <ClInclude Include="tier1\coeff_coder\gpu_coder_basic.h" />
     <ClInclude Include="tier1\coeff_coder\gpu_coeff_coder2.h" />
-    <ClInclude Include="tier1\coeff_coder\gpu_mq-coder.h" />
     <ClInclude Include="tier1\Dequant.h" />
     <ClInclude Include="tier2\buffer.h" />
     <ClInclude Include="tier2\codestream.h" />
@@ -214,6 +225,7 @@
     <ClInclude Include="tier2\tag_tree.h" />
     <ClInclude Include="tier2\tag_tree_encode.h" />
     <ClInclude Include="types\buffered_stream.h" />
+    <ClInclude Include="types\buffered_stream_type.h" />
     <ClInclude Include="types\image.h" />
     <ClInclude Include="types\image_mct.h" />
     <ClInclude Include="types\image_types.h" />
