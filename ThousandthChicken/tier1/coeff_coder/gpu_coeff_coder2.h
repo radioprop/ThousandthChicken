@@ -1,7 +1,5 @@
 #pragma once
 
-#define THREADS 32
-
 typedef struct
 {
 	int length;
@@ -10,6 +8,7 @@ typedef struct
 	unsigned char width;
 	unsigned char nominalWidth;
 	unsigned char height;
+	unsigned char nominalHeight;
 	unsigned char stripeNo;
 	unsigned char magbits;
 	unsigned char subband;
@@ -19,6 +18,8 @@ typedef struct
 
 	int magconOffset;
 
-	int* coefficients;
+	int gpuCoefficientsOffset;
+	int gpuCodestreamOffset;
+	int gpuSTBufferOffset;
 } CodeBlockAdditionalInfo;
 

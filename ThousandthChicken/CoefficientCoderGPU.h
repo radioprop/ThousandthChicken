@@ -14,7 +14,9 @@ class CoefficientCoderGPU
 {
 public:
 	CoefficientCoderGPU(OpenCLBasic& oclObjects) : oclObjects(oclObjects),
-		                                           executable(oclObjects,"CoefficientCoder.cl","","g_decode", "-g -s \"c:\\src\\ThousandthChicken\\ThousandthChicken\\CoefficientCoder.cl\"")
+		                                           executable(oclObjects,"CoefficientCoder.cl","","g_decode",
+												   "-I C:\\src\\ThousandthChicken\\ThousandthChicken\\tier1\\coeff_coder -I  C:\\src\\ThousandthChicken\\ThousandthChicken\\types  -I C:\\src\\ThousandthChicken\\ThousandthChicken ")
+												   // -g -s \"c:\\src\\ThousandthChicken\\ThousandthChicken\\CoefficientCoder.cl\"
 	{}
 	void decode_tile(type_tile *tile);
 private:

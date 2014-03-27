@@ -15,7 +15,6 @@ typedef struct
 	int significantBits;
 	int codingPasses;
 	int *coefficients;
-	int *h_coefficients;
 	int subband;
 	int width;
 	int height;

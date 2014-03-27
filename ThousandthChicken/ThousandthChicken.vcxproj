@@ -159,7 +159,6 @@
   <ItemGroup>
     <Intel_OpenCL_Build_Rules Include="CoefficientCoder.cl" />
     <Intel_OpenCL_Build_Rules Include="DiscreteWavelet.cl" />
-    <Intel_OpenCL_Build_Rules Include="MedianFilter.cl" />
     <Intel_OpenCL_Build_Rules Include="Preprocessor.cl" />
     <Intel_OpenCL_Build_Rules Include="Quantization.cl" />
   </ItemGroup>

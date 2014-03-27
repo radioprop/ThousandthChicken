@@ -105,6 +105,12 @@ void CoefficientCoderGPU::convert_to_decoding_task(EntropyCodingTaskInfo &task, 
 	task.coefficients = NULL;
 }
 
+
+//decode
+// #define THREADS 32
+//CHECK_ERRORS(GPU_JPEG2K::launch_decode((int) ceil((float) codeBlocks / THREADS), THREADS, d_stBuffors, d_inbuf, maxOutLength, d_infos, codeBlocks));
+//__kernel void g_decode(__global unsigned int *coeffBuffers, __global unsigned char *inbuf, int maxThreadBufferLength, __global CodeBlockAdditionalInfo *infos, int codeBlocks)
+
 float CoefficientCoderGPU::gpuDecode(EntropyCodingTaskInfo *infos, int count)
 {
 
@@ -119,44 +125,54 @@ float CoefficientCoderGPU::gpuDecode(EntropyCodingTaskInfo *infos, int count)
 
 
     // execute kernel
-    QueryPerformanceCounter(&perf_start);
-
-    //allocate d_inbuf on device
-	cl_mem d_inbuf = clCreateBuffer(oclObjects.context, CL_MEM_READ_WRITE, sizeof(unsigned char) * codeBlocks * maxOutLength, NULL, &err);
-    SAMPLE_CHECK_ERRORS(err);
-    if (d_inbuf == (cl_mem)0)
-        throw Error("Failed to create d_inbuf Buffer!");
-
-	// allocate and initialize h_infos on host
 	cl_uint dev_alignment = requiredOpenCLAlignment(oclObjects.device);
+
+	// allocate codestream buffer on host
+	unsigned char* h_codestreamBuffers = (unsigned char*)aligned_malloc(sizeof(unsigned char) * codeBlocks * maxOutLength,dev_alignment);
+    if (h_codestreamBuffers == NULL)
+        throw Error("Failed to create h_codestreamBuffer Buffer!");
+
+
+	// allocate h_infos on host
 	CodeBlockAdditionalInfo *h_infos = (CodeBlockAdditionalInfo *) aligned_malloc(sizeof(CodeBlockAdditionalInfo) * codeBlocks,dev_alignment);
+	   if (h_infos == NULL)
+        throw Error("Failed to create h_infos Buffer!");
+
+    //initialize h_infos
 	int magconOffset = 0;
+	int coefficientsOffset = 0;
 	for(int i = 0; i < codeBlocks; i++)
 	{
 		h_infos[i].width = infos[i].width;
 		h_infos[i].height = infos[i].height;
 		h_infos[i].nominalWidth = infos[i].nominalWidth;
+		h_infos[i].nominalHeight = infos[i].nominalHeight;
 		h_infos[i].stripeNo = (int) ceil(infos[i].height / 4.0f);
 		h_infos[i].subband = infos[i].subband;
 		h_infos[i].magconOffset = magconOffset + infos[i].width;
 		h_infos[i].magbits = infos[i].magbits;
 		h_infos[i].length = infos[i].length;
 		h_infos[i].significantBits = infos[i].significantBits;
-		h_infos[i].coefficients = NULL;
+		h_infos[i].gpuCoefficientsOffset = coefficientsOffset;
+		coefficientsOffset +=  infos[i].nominalWidth * infos[i].nominalHeight;
 
-		//allocate coefficients buffer on device, and copy to h_infos[i].coefficients and infos[i].coefficients
-#ifdef CUDA
-		cuda_d_allocate_mem((void **) &(h_infos[i].coefficients), sizeof(int) * infos[i].nominalWidth * infos[i].nominalHeight);
-		infos[i].coefficients = h_infos[i].coefficients;
-#endif
-
-	    //copy codestream buffer to device
-#ifdef CUDA
-		cuda_memcpy_htd(infos[i].codeStream, (void *) (d_inbuf + i * maxOutLength), sizeof(unsigned char) * infos[i].length);
-#endif
+	    //copy codeStream buffer to host memory block
+		memcpy(infos[i].codeStream, (void *) (h_codestreamBuffers + i * maxOutLength), sizeof(unsigned char) * infos[i].length);
 
 		magconOffset += h_infos[i].width * (h_infos[i].stripeNo + 2);
 	}
+
+	//allocate d_coefficients on device
+	cl_mem d_decodedCoefficientsBuffers = clCreateBuffer(oclObjects.context, CL_MEM_READ_WRITE ,  sizeof(int) * coefficientsOffset, NULL, &err);
+    SAMPLE_CHECK_ERRORS(err);
+    if (d_decodedCoefficientsBuffers == (cl_mem)0)
+        throw Error("Failed to create d_decodedCoefficientsBuffers Buffer!");
+
+	//allocate d_codestreamBuffer on device and pin to host memory
+	cl_mem d_codestreamBuffers = clCreateBuffer(oclObjects.context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(unsigned char) * codeBlocks * maxOutLength, h_codestreamBuffers, &err);
+    SAMPLE_CHECK_ERRORS(err);
+    if (d_codestreamBuffers == (cl_mem)0)
+        throw Error("Failed to create d_codestreamBuffers Buffer!");
 
 	//allocate d_stBuffers on device and initialize it to zero
 	cl_mem d_stBuffers = clCreateBuffer(oclObjects.context, CL_MEM_READ_WRITE ,  sizeof(unsigned int) * magconOffset, NULL, &err);
@@ -166,12 +182,12 @@ float CoefficientCoderGPU::gpuDecode(EntropyCodingTaskInfo *infos, int count)
 	cl_int pattern = 0;
 	clEnqueueFillBuffer(oclObjects.queue, d_stBuffers, &pattern, sizeof(cl_int), 0, sizeof(unsigned int) * magconOffset, 0, NULL, NULL);
 
-
-    //allocate and initialize d_infos on device
+    //allocate d_infos on device and pin to host memory
 	cl_mem d_infos = clCreateBuffer(oclObjects.context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,  sizeof(CodeBlockAdditionalInfo) * codeBlocks, h_infos, &err);
     SAMPLE_CHECK_ERRORS(err);
     if (d_infos == (cl_mem)0)
         throw Error("Failed to create d_infos Buffer!");
+
 
 	/////////////////////////////////////////////////////////////////////////////
 	// set kernel arguments ///////////////////////////////
@@ -180,8 +196,8 @@ float CoefficientCoderGPU::gpuDecode(EntropyCodingTaskInfo *infos, int count)
 	err = clSetKernelArg(executable.kernel, 0, sizeof(cl_mem), (void *) &d_stBuffers);
     SAMPLE_CHECK_ERRORS(err);
 	
-	//set kernel argument 1 to d_inbuf
-	err = clSetKernelArg(executable.kernel, 1, sizeof(cl_mem), (void *) &d_inbuf);
+	//set kernel argument 1 to d_codestreamBuffer
+	err = clSetKernelArg(executable.kernel, 1, sizeof(cl_mem), (void *) &d_codestreamBuffers);
     SAMPLE_CHECK_ERRORS(err);
 	
 	//set kernel argument 2 to maxOutLength
@@ -195,14 +211,17 @@ float CoefficientCoderGPU::gpuDecode(EntropyCodingTaskInfo *infos, int count)
 	//set kernel argument 4 to codeBlocks
 	err = clSetKernelArg(executable.kernel, 4, sizeof(int), (void *) &codeBlocks);
     SAMPLE_CHECK_ERRORS(err);
+
+	//set kernel argument 5 to d_decodedCoefficientsBuffer
+	err = clSetKernelArg(executable.kernel, 5, sizeof(cl_mem), (void *) &d_decodedCoefficientsBuffers);
+    SAMPLE_CHECK_ERRORS(err);
+
 	//////////////////////////////////////////////////////////////////////////////////
-
-	
-	//decode
-	//CHECK_ERRORS(GPU_JPEG2K::launch_decode((int) ceil((float) codeBlocks / THREADS), THREADS, d_stBuffors, d_inbuf, maxOutLength, d_infos, codeBlocks));
-	//__kernel void g_decode(__global unsigned int *coeffBuffers, __global unsigned char *inbuf, int maxThreadBufferLength, __global CodeBlockAdditionalInfo *infos, int codeBlocks)
-
-	size_t global_work_size[1] = { codeBlocks};
+		
+	/////////////////////////////
+	// execute kernel
+	QueryPerformanceCounter(&perf_start);
+	size_t global_work_size[1] = {codeBlocks};
     // execute kernel
     err = clEnqueueNDRangeKernel(oclObjects.queue, executable.kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
     SAMPLE_CHECK_ERRORS(err);
@@ -211,27 +230,58 @@ float CoefficientCoderGPU::gpuDecode(EntropyCodingTaskInfo *infos, int count)
     SAMPLE_CHECK_ERRORS(err);
     QueryPerformanceCounter(&perf_stop);
 
+
+	//////////////////////////////
+	// read memory back into host from decodedCoefficientsBuffer on device 
+
+    int* tmp_ptr = NULL;
+    tmp_ptr = (int*)clEnqueueMapBuffer(oclObjects.queue, d_decodedCoefficientsBuffers, true, CL_MAP_READ, 0,  sizeof(int) * coefficientsOffset, 0, NULL, NULL, NULL);
+    err = clFinish(oclObjects.queue);
+    SAMPLE_CHECK_ERRORS(err);
+
+	int* decodedBuffer = tmp_ptr;
+	coefficientsOffset = 0;
+	for(int i = 0; i < codeBlocks; i++)
+	{
+		int coeffecientsBufferSize = infos[i].nominalWidth * infos[i].nominalHeight;
+		infos[i].coefficients = (int*)malloc(coeffecientsBufferSize *sizeof(int));
+
+		if (infos[i].significantBits > 0)
+			memcpy(infos[i].coefficients, decodedBuffer, coeffecientsBufferSize * sizeof(int));
+		else
+			memset(infos[i].coefficients,  0, coeffecientsBufferSize * sizeof(int));
+      decodedBuffer +=  coeffecientsBufferSize;
+	}
+
+    err = clEnqueueUnmapMemObject(oclObjects.queue, d_decodedCoefficientsBuffers, tmp_ptr, 0, NULL, NULL);
+    SAMPLE_CHECK_ERRORS(err);
+
+
+    //////////////////////////////////////////
+    //release memory
+
 	 err = clReleaseMemObject(d_infos);
     SAMPLE_CHECK_ERRORS(err);
 
 	err = clReleaseMemObject(d_stBuffers);
     SAMPLE_CHECK_ERRORS(err);
 		
-	err = clReleaseMemObject(d_inbuf);
+	err = clReleaseMemObject(d_codestreamBuffers);
+    SAMPLE_CHECK_ERRORS(err);
+
+	err = clReleaseMemObject(d_decodedCoefficientsBuffers);
     SAMPLE_CHECK_ERRORS(err);
 
 	aligned_free(h_infos);
 
+	aligned_free(h_codestreamBuffers);
+
+
 	// retrieve perf. counter frequency
 	QueryPerformanceCounter(&perf_stop);
     QueryPerformanceFrequency(&perf_freq);
-    return (float)(perf_stop.QuadPart - perf_start.QuadPart)/(float)perf_freq.QuadPart;
+    float rc =  (float)(perf_stop.QuadPart - perf_start.QuadPart)/(float)perf_freq.QuadPart;
+
+	return rc;
 
 }
-
-#ifdef CUDA
-void launch_decode(dim3 gridDim, dim3 blockDim, unsigned int *coeffBuffers, unsigned char *inbuf, int maxThreadBufforLength, CodeBlockAdditionalInfo *infos, int codeBlocks)
-{
-	g_decode<<<gridDim, blockDim>>>(coeffBuffers, inbuf, maxThreadBufforLength, infos, codeBlocks);
-}
-#endif

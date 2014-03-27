@@ -40,30 +40,30 @@ __constant const unsigned char SWITCH[] = {
 #define CX_UNI 17
 
 
- unsigned char getI(MQEncoder encoder, int id)
+ unsigned char getI(MQEncoder* encoder, int id)
 {
 	unsigned char out = 0;
 
-	out |= ((encoder.Ib0 >> id) & 1);
-	out |= ((encoder.Ib1 >> id) & 1) << 1;
-	out |= ((encoder.Ib2 >> id) & 1) << 2;
-	out |= ((encoder.Ib3 >> id) & 1) << 3;
-	out |= ((encoder.Ib4 >> id) & 1) << 4;
-	out |= ((encoder.Ib5 >> id) & 1) << 5;
+	out |= ((encoder->Ib0 >> id) & 1);
+	out |= ((encoder->Ib1 >> id) & 1) << 1;
+	out |= ((encoder->Ib2 >> id) & 1) << 2;
+	out |= ((encoder->Ib3 >> id) & 1) << 3;
+	out |= ((encoder->Ib4 >> id) & 1) << 4;
+	out |= ((encoder->Ib5 >> id) & 1) << 5;
 
 	return out;
 }
 
- void setI(MQEncoder encoder, int id, unsigned char value)
+ void setI(MQEncoder* encoder, int id, unsigned char value)
 {
 	unsigned int mask = ~(1 << id);
 
-	encoder.Ib0 = (encoder.Ib0 & mask) | (((value) & 1) << id);
-	encoder.Ib1 = (encoder.Ib1 & mask) | (((value >> 1) & 1) << id);
-	encoder.Ib2 = (encoder.Ib2 & mask) | (((value >> 2) & 1) << id);
-	encoder.Ib3 = (encoder.Ib3 & mask) | (((value >> 3) & 1) << id);
-	encoder.Ib4 = (encoder.Ib4 & mask) | (((value >> 4) & 1) << id);
-	encoder.Ib5 = (encoder.Ib5 & mask) | (((value >> 5) & 1) << id);
+	encoder->Ib0 = (encoder->Ib0 & mask) | (((value) & 1) << id);
+	encoder->Ib1 = (encoder->Ib1 & mask) | (((value >> 1) & 1) << id);
+	encoder->Ib2 = (encoder->Ib2 & mask) | (((value >> 2) & 1) << id);
+	encoder->Ib3 = (encoder->Ib3 & mask) | (((value >> 3) & 1) << id);
+	encoder->Ib4 = (encoder->Ib4 & mask) | (((value >> 4) & 1) << id);
+	encoder->Ib5 = (encoder->Ib5 & mask) | (((value >> 5) & 1) << id);
 }
 
  void SwitchNthBit(int reg, int n)
@@ -76,133 +76,133 @@ __constant const unsigned char SWITCH[] = {
 	return (reg >> n) & 1;
 }
 
- void mqResetDec(MQDecoder decoder)
+ void mqResetDec(MQDecoder* decoder)
 {
-	decoder.encoder.Ib0 = 0;
-	decoder.encoder.Ib1 = 0;
-	decoder.encoder.Ib2 = 0;
-	decoder.encoder.Ib3 = 0;
-	decoder.encoder.Ib4 = 0;
-	decoder.encoder.Ib5 = 0;
+	decoder->encoder.Ib0 = 0;
+	decoder->encoder.Ib1 = 0;
+	decoder->encoder.Ib2 = 0;
+	decoder->encoder.Ib3 = 0;
+	decoder->encoder.Ib4 = 0;
+	decoder->encoder.Ib5 = 0;
 
-	setI(decoder.encoder, CX_UNI, 46);
-	setI(decoder.encoder, CX_RUN, 3);
-	setI(decoder.encoder, 0, 4);
+	setI(&decoder->encoder, CX_UNI, 46);
+	setI(&decoder->encoder, CX_RUN, 3);
+	setI(&decoder->encoder, 0, 4);
 
-	decoder.encoder.CXMPS = 0;
+	decoder->encoder.CXMPS = 0;
 }
 
- void bytein(MQDecoder decoder)
+ void bytein(MQDecoder* decoder)
 {
-	decoder.encoder.CT = 8;
-	if(decoder.encoder.L == decoder.Lmax - 1 || (decoder.encoder.T == (unsigned char) 0xFF && decoder.NT > (unsigned char) 0x8F))
-		decoder.encoder.C += 0xFF00;
+	decoder->encoder.CT = 8;
+	if(decoder->encoder.L == decoder->Lmax - 1 || (decoder->encoder.T == (unsigned char) 0xFF && decoder->NT > (unsigned char) 0x8F))
+		decoder->encoder.C += 0xFF00;
 	else
 	{
-		if(decoder.encoder.T == (unsigned char) 0xFF)
-			decoder.encoder.CT = 7;
+		if(decoder->encoder.T == (unsigned char) 0xFF)
+			decoder->encoder.CT = 7;
 
-		decoder.encoder.T = decoder.NT;
-		decoder.NT = decoder.encoder.outbuf[decoder.encoder.L + 1];
-		decoder.encoder.L++;
-		decoder.encoder.C += decoder.encoder.T << (16 - decoder.encoder.CT);
+		decoder->encoder.T = decoder->NT;
+		decoder->NT = decoder->encoder.outbuf[decoder->encoder.L + 1];
+		decoder->encoder.L++;
+		decoder->encoder.C += decoder->encoder.T << (16 - decoder->encoder.CT);
 	}
 }
 
- void renormd(MQDecoder decoder)
+ void renormd(MQDecoder* decoder)
 {
 	do
 	{
-		if(decoder.encoder.CT == 0)
+		if(decoder->encoder.CT == 0)
 			bytein(decoder);
 
-		decoder.encoder.A <<= 1;
-		decoder.encoder.C <<= 1;
-		decoder.encoder.CT -= 1;
+		decoder->encoder.A <<= 1;
+		decoder->encoder.C <<= 1;
+		decoder->encoder.CT -= 1;
 	}
-	while((decoder.encoder.A & 0x8000) == 0);
+	while((decoder->encoder.A & 0x8000) == 0);
 }
 
- int lps_exchange(MQDecoder decoder)
+ int lps_exchange(MQDecoder* decoder)
 {
 	int D;
-	unsigned int p = Qe[getI(decoder.encoder, decoder.encoder.CX)];
+	unsigned int p = Qe[getI(&decoder->encoder, decoder->encoder.CX)];
 
 
-	if(decoder.encoder.A < p)
+	if(decoder->encoder.A < p)
 	{
-		decoder.encoder.A = p;
-		D = GetNthBit(decoder.encoder.CXMPS, decoder.encoder.CX);
-		setI(decoder.encoder, decoder.encoder.CX, NMPS[getI(decoder.encoder, decoder.encoder.CX)]);
+		decoder->encoder.A = p;
+		D = GetNthBit(decoder->encoder.CXMPS, decoder->encoder.CX);
+		setI(&decoder->encoder, decoder->encoder.CX, NMPS[getI(&decoder->encoder, decoder->encoder.CX)]);
 	}
 	else
 	{
-		decoder.encoder.A = p;
-		D = 1 - GetNthBit(decoder.encoder.CXMPS, decoder.encoder.CX);
+		decoder->encoder.A = p;
+		D = 1 - GetNthBit(decoder->encoder.CXMPS, decoder->encoder.CX);
 
-		if(SWITCH[getI(decoder.encoder, decoder.encoder.CX)])
-			SwitchNthBit(decoder.encoder.CXMPS, decoder.encoder.CX);
+		if(SWITCH[getI(&decoder->encoder, decoder->encoder.CX)])
+			SwitchNthBit(decoder->encoder.CXMPS, decoder->encoder.CX);
 
-		setI(decoder.encoder, decoder.encoder.CX, NLPS[getI(decoder.encoder, decoder.encoder.CX)]);
+		setI(&decoder->encoder, decoder->encoder.CX, NLPS[getI(&decoder->encoder, decoder->encoder.CX)]);
 	}
 
 	return D;
 }
 
- int mps_exchange(MQDecoder decoder)
+ int mps_exchange(MQDecoder* decoder)
 {
 	int D;
-	unsigned int p = Qe[getI(decoder.encoder, decoder.encoder.CX)];
+	unsigned int p = Qe[getI(&decoder->encoder, decoder->encoder.CX)];
 
 
-	if(decoder.encoder.A < p)
+	if(decoder->encoder.A < p)
 	{
-		D = 1 - GetNthBit(decoder.encoder.CXMPS, decoder.encoder.CX);
+		D = 1 - GetNthBit(decoder->encoder.CXMPS, decoder->encoder.CX);
 
-		if(SWITCH[getI(decoder.encoder, decoder.encoder.CX)])
-			SwitchNthBit(decoder.encoder.CXMPS, decoder.encoder.CX);
+		if(SWITCH[getI(&decoder->encoder, decoder->encoder.CX)])
+			SwitchNthBit(decoder->encoder.CXMPS, decoder->encoder.CX);
 		
-		setI(decoder.encoder, decoder.encoder.CX, NLPS[getI(decoder.encoder, decoder.encoder.CX)]);
+		setI(&decoder->encoder, decoder->encoder.CX, NLPS[getI(&decoder->encoder, decoder->encoder.CX)]);
 	}
 	else
 	{
-		D = GetNthBit(decoder.encoder.CXMPS, decoder.encoder.CX);
-		setI(decoder.encoder, decoder.encoder.CX, NMPS[getI(decoder.encoder, decoder.encoder.CX)]);
+		D = GetNthBit(decoder->encoder.CXMPS, decoder->encoder.CX);
+		setI(&decoder->encoder, decoder->encoder.CX, NMPS[getI(&decoder->encoder, decoder->encoder.CX)]);
 	}
 
 	return D;
 }
 
- void mqInitDec(MQDecoder decoder, __global unsigned char *inbuf, int codeLength)
+ void mqInitDec(MQDecoder* decoder, __global unsigned char *inbuf, int codeLength)
 {
-	decoder.encoder.outbuf = inbuf;
+	decoder->encoder.outbuf = inbuf;
 
-	decoder.encoder.L = -1;
-	decoder.Lmax = codeLength;
-	decoder.encoder.T = 0;
-	decoder.NT = 0;
-
-	bytein(decoder);
-	bytein(decoder);
-
-	decoder.encoder.C = ((unsigned char) decoder.encoder.T) << 16;
+	decoder->encoder.L = -1;
+	decoder->Lmax = codeLength;
+	decoder->encoder.T = 0;
+	decoder->NT = 0;
 
 	bytein(decoder);
+	bytein(decoder);
 
-	decoder.encoder.C <<= 7;
-	decoder.encoder.CT -= 7;
-	decoder.encoder.A = 0x8000;
+	decoder->encoder.C = ((unsigned char) decoder->encoder.T) << 16;
+
+	bytein(decoder);
+
+	decoder->encoder.C <<= 7;
+	decoder->encoder.CT -= 7;
+	decoder->encoder.A = 0x8000;
 }
 
- int mqDecode(MQDecoder decoder, int context)
+ int mqDecode(MQDecoder* decoder, int context)
 {
-	decoder.encoder.CX = context;
+	decoder->encoder.CX = context;
 
-	unsigned int p = Qe[getI(decoder.encoder, decoder.encoder.CX)];
+	unsigned int p = Qe[getI(&decoder->encoder, decoder->encoder.CX)];
 	int out;
-	decoder.encoder.A -= p;
+	decoder->encoder.A -= p;
 
-	if((decoder.encoder.C >> 16) < p)
+	if((decoder->encoder.C >> 16) < p)
 	{
 		out = lps_exchange(decoder);
 		renormd(decoder);
@@ -210,16 +210,16 @@ __constant const unsigned char SWITCH[] = {
 	else
 	{
 		// decrement 16 most significant bits of C register by p
-		decoder.encoder.C = (decoder.encoder.C & 0x0000FFFF) | (((decoder.encoder.C >> 16) - p) << 16);
+		decoder->encoder.C = (decoder->encoder.C & 0x0000FFFF) | (((decoder->encoder.C >> 16) - p) << 16);
 
-		if((decoder.encoder.A & 0x8000) == 0)
+		if((decoder->encoder.A & 0x8000) == 0)
 		{
 			out = mps_exchange(decoder);
 			renormd(decoder);
 		}
 		else
 		{
-			out = GetNthBit(decoder.encoder.CXMPS, decoder.encoder.CX);
+			out = GetNthBit(decoder->encoder.CXMPS, decoder->encoder.CX);
 		}
 	}
 	return out;
@@ -476,7 +476,7 @@ __constant float distWeights[2][4][4] = {
 }
 
 
- char RLDecodeFunctor(CtxWindow *window, MQDecoder dec)
+ char RLDecodeFunctor(CtxWindow *window, MQDecoder* dec)
 {
 	char rest = 0;
 
@@ -499,7 +499,7 @@ __constant float distWeights[2][4][4] = {
 
 
 
- void SigDecodeFunctor(CtxWindow *window, CtxReg sig, MQDecoder dec, int stripId, int subband)
+ void SigDecodeFunctor(CtxWindow *window, CtxReg sig, MQDecoder* dec, int stripId, int subband)
 {
 	window->c |= mqDecode(dec, getSPCX(sig, stripId, subband)) << (3 * stripId);
 }
@@ -507,7 +507,7 @@ __constant float distWeights[2][4][4] = {
 
 
 
- void SignDecodeFunctor(CtxWindow *window, CtxReg sig, MQDecoder dec, int stripId)
+ void SignDecodeFunctor(CtxWindow *window, CtxReg sig, MQDecoder* dec, int stripId)
 {
 	unsigned char cx = getSICX(sig, buildCtxReg(window, 13), stripId);
 
@@ -517,7 +517,7 @@ __constant float distWeights[2][4][4] = {
 
 
 
- void CleanUpPassFunctor(const CodeBlockAdditionalInfo info, CtxWindow *window, MQDecoder mq, float *sum_dist, unsigned char bitplane)
+ void CleanUpPassFunctor(const CodeBlockAdditionalInfo info, CtxWindow *window, MQDecoder* mq, float *sum_dist, unsigned char bitplane)
 {
 	char rest;
 
@@ -560,7 +560,7 @@ __constant float distWeights[2][4][4] = {
 
 
 
- void SigPropPassFunctor(const CodeBlockAdditionalInfo info, CtxWindow *window, MQDecoder mq, float *sum_dist, unsigned char bitplane)
+ void SigPropPassFunctor(const CodeBlockAdditionalInfo info, CtxWindow *window, MQDecoder* mq, float *sum_dist, unsigned char bitplane)
 {
 	CtxReg sig = buildCtxReg(window, 1); // build significance context register
 
@@ -600,7 +600,7 @@ __constant float distWeights[2][4][4] = {
 
 
 
- void MagRefPassFunctor(const CodeBlockAdditionalInfo info, CtxWindow *window, MQDecoder mq, float *sum_dist, unsigned char bitplane)
+ void MagRefPassFunctor(const CodeBlockAdditionalInfo info, CtxWindow *window, MQDecoder* mq, float *sum_dist, unsigned char bitplane)
 {
 	for(int i = 0; i < 4; i++)
 	{
@@ -617,48 +617,31 @@ __constant float distWeights[2][4][4] = {
 		}
 	}
 }
- void initCoeffs(const CodeBlockAdditionalInfo info, __global unsigned int  *coeffs)
-{
-	unsigned char signOffset = sizeof(int) * 8 - 1;
 
+ void initDecodingCoeffs(const CodeBlockAdditionalInfo info, __global unsigned int  *coeffs,__global int* decodedCoefficients)
+{
+    int maxIndex =   sizeof(int) * info.nominalWidth * info.nominalHeight;
 	for(int i = 0; i < info.width; i++)
 		for(int j = 0; j < info.stripeNo; j++)
 		{
 			unsigned int  st = 0;
-			int c;
 
 			for(int k = 0; k < 4; k++)
 				if(4 * j + k < info.height)
 				{
-					c = info.coefficients[(4 * j + k) * info.nominalWidth + i];
-					//Cstates[l++] = (4 * j + k) * info.nominalWidth + i;
-					st |= (((c >> signOffset) & 1) << (13 + 3 * k));
+				   int index = (4 * j + k) * info.nominalWidth + i;
+				   if (index < maxIndex)
+					     decodedCoefficients[index] = 0;
 				}
+					
 				else
-					st |= (1 << (14 + 3 * k));
+				  st |= (1 << (14 + 3 * k));
 
 			coeffs[j * info.width + i] = st;
 		}
 }
 
- void initDecodingCoeffs(const CodeBlockAdditionalInfo info, __global unsigned int  *coeffs)
-{
-	for(int i = 0; i < info.width; i++)
-		for(int j = 0; j < info.stripeNo; j++)
-		{
-			unsigned int  st = 0;
-
-			for(int k = 0; k < 4; k++)
-				if(4 * j + k < info.height)
-					info.coefficients[(4 * j + k) * info.nominalWidth + i] = 0;
-				else
-					st |= (1 << (14 + 3 * k));
-
-			coeffs[j * info.width + i] = st;
-		}
-}
-
- void uploadSigns(const CodeBlockAdditionalInfo info, __global unsigned int  *coeffs)
+ void uploadSigns(const CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, __global int* decodedCoefficients)
 {
 	unsigned char signOffset = sizeof(int) * 8 - 1;
 
@@ -669,13 +652,13 @@ __constant float distWeights[2][4][4] = {
 
 			for(int k = 0; k < 4; k++)
 				if(((st >> (14 + 3 * k)) & 1) == 0)
-					info.coefficients[(4 * j + k) * info.nominalWidth + i] |= (((st >> (13 + 3 * k)) & 1) << signOffset);
+					decodedCoefficients[(4 * j + k) * info.nominalWidth + i] |= (((st >> (13 + 3 * k)) & 1) << signOffset);
 
 			coeffs[j * info.width + i] = st;
 		}
 }
 
- void fillMags(const CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, int bitplane)
+ void fillMags(const CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, int bitplane, __global int* decodedCoefficients)
 {
 	for(int i = 0; i < info.width; i++)
 		for(int j = 0; j < info.stripeNo; j++)
@@ -688,13 +671,13 @@ __constant float distWeights[2][4][4] = {
 
 			for(int k = 0; k < 4; k++)
 				if(((st >> (14 + 3 * k)) & 1) == 0)
-					st |= ((info.coefficients[(4 * j + k) * info.nominalWidth + i] >> bitplane) & 1) << (3 * k);
+					st |= ((decodedCoefficients[(4 * j + k) * info.nominalWidth + i] >> bitplane) & 1) << (3 * k);
 
 			coeffs[j * info.width + i] = st;
 		}
 }
 
- void uploadMags(const CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, int bitplane)
+ void uploadMags(const CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, int bitplane, __global int* decodedCoefficients)
 {
 	for(int i = 0; i < info.width; i++)
 		for(int j = 0; j < info.stripeNo; j++)
@@ -703,7 +686,7 @@ __constant float distWeights[2][4][4] = {
 
 			for(int k = 0; k < 4; k++)
 				if(((st >> (14 + 3 * k)) & 1) == 0)
-					info.coefficients[(4 * j + k) * info.nominalWidth + i] |= (((st >> (3 * k)) & 1) << bitplane);
+					decodedCoefficients[(4 * j + k) * info.nominalWidth + i] |= (((st >> (3 * k)) & 1) << bitplane);
 
 			// clear magnitudes and already coded flags
 			st &= ~(TRIMASK | (TRIMASK << 2));
@@ -728,7 +711,7 @@ __constant float distWeights[2][4][4] = {
 }
 
  
- void BITPLANE_WINDOW_SCAN_CLEAN( CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, MQDecoder enc, float *sum_dist, unsigned char bitplane) {
+ void BITPLANE_WINDOW_SCAN_CLEAN( CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, MQDecoder* enc, float *sum_dist, unsigned char bitplane) {
 	
 	 CtxWindow window;
  	 window.pos = -1;
@@ -761,7 +744,7 @@ __constant float distWeights[2][4][4] = {
 }
 
  
- void BITPLANE_WINDOW_SCAN_MAG( CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, MQDecoder enc, float *sum_dist, unsigned char bitplane) {
+ void BITPLANE_WINDOW_SCAN_MAG( CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, MQDecoder* enc, float *sum_dist, unsigned char bitplane) {
 	
 	 CtxWindow window;
  	 window.pos = -1;
@@ -794,7 +777,7 @@ __constant float distWeights[2][4][4] = {
 }
 
  
- void BITPLANE_WINDOW_SCAN_SIG( CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, MQDecoder enc, float *sum_dist, unsigned char bitplane) {
+ void BITPLANE_WINDOW_SCAN_SIG( CodeBlockAdditionalInfo info, __global unsigned int  *coeffs, MQDecoder* enc, float *sum_dist, unsigned char bitplane) {
 	
 	 CtxWindow window;
  	 window.pos = -1;
@@ -826,7 +809,9 @@ __constant float distWeights[2][4][4] = {
 	}
 }
 
-__kernel void g_decode(__global unsigned int *coeffBuffers, __global unsigned char *inbuf, int maxThreadBufferLength, __global CodeBlockAdditionalInfo *infos, int codeBlocks)
+__kernel void g_decode(__global unsigned int *stBuffers, __global unsigned char *codestreamBuffer, 
+                            int maxThreadBufferLength, __global CodeBlockAdditionalInfo *codeblockInfoArray, 
+							  int codeBlocks,__global int* decodedCoefficientsBuffer)
 {
 
 	
@@ -834,48 +819,42 @@ __kernel void g_decode(__global unsigned int *coeffBuffers, __global unsigned ch
 	if(idx >= codeBlocks)
 		return;
 
-	CodeBlockAdditionalInfo info = infos[idx];
-	__global unsigned char *in = inbuf + idx * maxThreadBufferLength;
-	__global unsigned int* coeffs = coeffBuffers + info.magconOffset;
-	
+	CodeBlockAdditionalInfo codeblockInfo = codeblockInfoArray[idx];
+	__global unsigned char *codestream = codestreamBuffer + idx * maxThreadBufferLength;
+	__global unsigned int* st = stBuffers + codeblockInfo.magconOffset;
+	__global int* decodedCoefficients = decodedCoefficientsBuffer + codeblockInfo.gpuCoefficientsOffset;
+
 	MQDecoder mqdec;
-	mqInitDec(mqdec, in, info.length);
-	
-	/*
+	mqInitDec(&mqdec, codestream, codeblockInfo.length);
 	float sum_dist = 0.0f;
 
-
-	if(info.significantBits > 0)
+	if(codeblockInfo.significantBits > 0)
 	{
-		mqResetDec(mqdec);
+		mqResetDec(&mqdec);
 
-		initDecodingCoeffs(info, coeffs);
+		initDecodingCoeffs(codeblockInfo, st, decodedCoefficients);
+		
+		BITPLANE_WINDOW_SCAN_CLEAN(codeblockInfo, st, &mqdec, &sum_dist, 0);
 
-		BITPLANE_WINDOW_SCAN_CLEAN(info, coeffs, mqdec, &sum_dist, 0);
+		uploadMags(codeblockInfo, st, 30 - codeblockInfo.magbits + codeblockInfo.significantBits,decodedCoefficients);
 
-		uploadMags(info, coeffs, 30 - info.magbits + info.significantBits);
-
-		for(unsigned char i = 1; i < info.significantBits; i++)
+		for(unsigned char i = 1; i < codeblockInfo.significantBits; i++)
 		{
-			BITPLANE_WINDOW_SCAN_SIG(info, coeffs, mqdec, &sum_dist, 0);
+			BITPLANE_WINDOW_SCAN_SIG(codeblockInfo, st, &mqdec, &sum_dist, 0);
 
-			BITPLANE_WINDOW_SCAN_MAG(info, coeffs, mqdec, &sum_dist, 0);
+			BITPLANE_WINDOW_SCAN_MAG(codeblockInfo, st, &mqdec, &sum_dist, 0);
 
-			BITPLANE_WINDOW_SCAN_CLEAN(info, coeffs, mqdec, &sum_dist, 0);
+			BITPLANE_WINDOW_SCAN_CLEAN(codeblockInfo, st, &mqdec, &sum_dist, 0);
 
-			uploadMags(info, coeffs, 30 - info.magbits - i + info.significantBits);
+			uploadMags(codeblockInfo, st, 30 - codeblockInfo.magbits - i + codeblockInfo.significantBits,decodedCoefficients);
 		}
 
-		uploadSigns(info, coeffs);
-		//mqDecode(mqdec, CX_UNI);
+		uploadSigns(codeblockInfo, st,decodedCoefficients);
+		
 	}
-	else
-	{
-		for(int i = 0; i < info.height; i++)
-			for(int j = 0; j < info.width; j++)
-				info.coefficients[i * info.nominalWidth + j] = 0;
-	}
-	*/
+
+	
+	
 }
 
 

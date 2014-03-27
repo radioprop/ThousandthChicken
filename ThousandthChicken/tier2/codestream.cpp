@@ -479,10 +479,10 @@ void decode_packet_body(type_buffer *buffer, type_res_lvl *res_lvl)
 			{
 				cblk->num_segments++;
 			}*/
-#ifdef CUDA
-			cuda_h_allocate_mem((void **) &(cblk->codestream), cblk->length);
-			cuda_memcpy_hth(buffer->bp, cblk->codestream, cblk->length);
-#endif
+
+			cblk->codestream = (unsigned char*)malloc(cblk->length);
+			memcpy(cblk->codestream, buffer->bp, cblk->length);
+
 //			int z;
 //
 //			for(z = 0; z < cblk->length; z++)
