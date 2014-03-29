@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "tier1/coeff_coder/gpu_coder.h"
+#include "tier1/coeff_coder/gpu_coder_basic.h"
 #include <list>
 #include "stdafx.h"
 
@@ -15,7 +15,7 @@ class CoefficientCoderGPU
 public:
 	CoefficientCoderGPU(OpenCLBasic& oclObjects) : oclObjects(oclObjects),
 		                                           executable(oclObjects,"CoefficientCoder.cl","","g_decode",
-												   "-I C:\\src\\ThousandthChicken\\ThousandthChicken\\tier1\\coeff_coder -I  C:\\src\\ThousandthChicken\\ThousandthChicken\\types  -I C:\\src\\ThousandthChicken\\ThousandthChicken ")
+												   "-I C:\\src\\ThousandthChicken\\ThousandthChicken\\tier1\\coeff_coder")
 												   // -g -s \"c:\\src\\ThousandthChicken\\ThousandthChicken\\CoefficientCoder.cl\"
 	{}
 	void decode_tile(type_tile *tile);

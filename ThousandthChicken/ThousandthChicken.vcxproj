@@ -193,7 +193,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CoefficientCoderGPU.h" />
-    <ClInclude Include="CoefficientCoderMQGPU.h" />
     <ClInclude Include="common\basic.hpp" />
     <ClInclude Include="common\cmdparser.hpp" />
     <ClInclude Include="common\oclobject.hpp" />
@@ -213,7 +212,6 @@
     <ClInclude Include="QuantizationGPU.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="tier1\coeff_coder\gpu_coder.h" />
     <ClInclude Include="tier1\coeff_coder\gpu_coder_basic.h" />
     <ClInclude Include="tier1\coeff_coder\gpu_coeff_coder2.h" />
     <ClInclude Include="tier1\Dequant.h" />
